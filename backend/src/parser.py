@@ -1,52 +1,53 @@
+import spacy
 import re
-from model_loder import nlp_pipeline
+from spacy.matcher import PhraseMatcher
 
-APPLICATIONS=["zoom","youtube","teams","netflix","skype"]
-ACTIONS={
-    "block":["block","stop","ban","prevent"],
-    "prioritize":["prioritize","prefer","give priority","boost"],
-    "allow":["allow","permit","enable","access"]
+nlp = spacy.load("en_core_web_sm")
+
+APPLICATIONS = ["zoom", "youtube", "teams", "netflix", "skype"]
+ACTIONS = {
+    "block": ["block", "ban", "stop", "prevent"],
+    "allow": ["allow", "permit", "enable", "access"],
+    "prioritize": ["prioritize", "prefer", "boost", "give priority"]
 }
 
+app_matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+app_patterns = [nlp.make_doc(app) for app in APPLICATIONS]
+app_matcher.add("APP", app_patterns)
+
 def extract_intent_and_entities(text):
-    text=text.lower()
-    new_result=nlp_pipeline(text)
+    doc = nlp(text.lower())
 
-    found_apps=[]
-    intents=[]
+    app_matches = app_matcher(doc)
+    apps = {doc[start:end].text: start for match_id, start, end in app_matches}
 
-    app_positions=[]
-    for entity in new_result:
-        word=entity['word'].lower()
-        for app in APPLICATIONS:
-            if app in word:
-                start=text.find(app)
-                app_positions.append((app,start))
-    
-    action_positions=[]
-    for act, keywords in ACTIONS.items():
+    action_positions = []
+    for action, keywords in ACTIONS.items():
         for kw in keywords:
-            for match in re.finditer(rf"\b{re.escape(kw)}\b", text):
-                action_positions.append((act, match.start()))
+            for match in re.finditer(rf"\b{re.escape(kw)}\b", text.lower()):
+                action_positions.append((action, match.start()))
 
-    
-    for app,app_pos in app_positions:
-        closest_action=None
-        min_dist=float('inf')
-        for act,act_pos in action_positions:
-            dist=abs(app_pos-act_pos)
-            if dist<min_dist:
-                min_dist=dist
-                closest_action=act
+    intents = []
+    for app, app_pos in apps.items():
+        closest_action = None
+        min_dist = float("inf")
+        for action, act_pos in action_positions:
+            dist = abs(app_pos - act_pos)
+            if dist < min_dist:
+                min_dist = dist
+                closest_action = action
         if closest_action:
             intents.append({
-                "application":app,
-                "action":closest_action
+                "application": app,
+                "action": closest_action
             })
+
     return {
-        "original_text":text,
-        "intents":intents
+        "original_text": text,
+        "intents": intents
     }
 
-        
-print(extract_intent_and_entities("Block YouTube and allow Zoom for meetings"))
+if __name__ == "__main__":
+    query = "Block YouTube and allow Zoom for meetings"
+    result = extract_intent_and_entities(query)
+    print(result)
