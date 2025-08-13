@@ -3,7 +3,7 @@ from datetime import datetime
 import yaml
 def save_file(yaml_content:str):
     timestamp=datetime.now().strftime("%Y_%m_%d_%H%M%S")
-    filename=f"polict_{timestamp}.yaml"
+    filename=f"policy_{timestamp}.yaml"
     dir_path=os.path.join("data","policy")
     save_path=os.path.join(dir_path,filename)
 
