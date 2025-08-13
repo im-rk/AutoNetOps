@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from dotenv import load_dotenv
-
+from src.utils.util import save_file
 load_dotenv()
 
 class LLMClientLangChain:
@@ -27,6 +27,6 @@ if __name__ == "__main__":
     client = LLMClientLangChain()
     query = "Block YouTube and prioritize Zoom during work hours"
     yaml_output = client.generate(query)
+    save_file(yaml_output)
     print(yaml_output)
-
     

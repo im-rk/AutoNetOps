@@ -1,0 +1,18 @@
+description: Block YouTube and prioritize Zoom during work hours (9 AM - 5 PM, Monday - Friday)
+
+intents:
+  - application: youtube
+    action: deny
+    condition:
+      time:
+        start: "09:00"
+        end: "17:00"
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+  - application: zoom
+    action: prioritize
+    condition:
+      time:
+        start: "09:00"
+        end: "17:00"
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]

@@ -1,9 +1,19 @@
 import os
-import pickle
+from datetime import datetime
+import yaml
+def save_file(yaml_content:str):
+    timestamp=datetime.now().strftime("%Y_%m_%d_%H%M%S")
+    filename=f"policy_{timestamp}.yaml"
+    dir_path=os.path.join("data","policy")
+    save_path=os.path.join(dir_path,filename)
 
-def save_object(file_path,obj):
-        dir_path=os.path.dirname(file_path)
-        os.makedirs(dir_path,exist_ok=True)
+    os.makedirs(dir_path,exist_ok=True)
+    with open(save_path,"w") as fp:
+        fp.write(yaml_content)
+    
+    print(f"file saved to {save_path}")
 
-        with open(dir_path,'wb') as fp:
-            pickle.dump(obj,fp)
+def load_policies(file_path):
+    with open(file_path,"r") as f:
+        data=yaml.safe_load(f)
+    return data.get("intents",{})
