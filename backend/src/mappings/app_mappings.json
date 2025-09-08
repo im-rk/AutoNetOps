@@ -1,4 +1,4 @@
 {
-    "youtube": ["youtube.com", "ytimg.com"],
+    "youtube": ["youtube.com", "ytimg.com"] ,
     "zoom": ["zoom.us", "zoomcdn.com"]
 }
