@@ -16,12 +16,7 @@ if SRC_DIR not in sys.path:
 from translator.rule import intents_to_rules   # adjust path if needed
 
 # Paths for YAML intents + mappings
-BASE_DIR = os.path.dirname(SRC_DIR)  # backend/
-INTENT_DIR = os.path.join(BASE_DIR, "data", "policy")
-MAPPING_FILE = os.path.join(SRC_DIR, "mappings", "app_mappings.json")
 
-# Pick one policy file (latest generated)
-POLICY_FILE = os.path.join(INTENT_DIR, "policy_2025_08_09_120920.yaml")
 
 
 # -----------------------------
@@ -49,19 +44,23 @@ def install_rules(rules):
 # -----------------------------
 # Main
 # -----------------------------
-if __name__ == "__main__":
+def run_installer(policy_file=None):
+    MAPPING_FILE = os.path.join(SRC_DIR, "mappings", "app_mappings.json")
+
+    BASE_DIR = os.path.dirname(SRC_DIR)
+    INTENT_DIR = os.path.join(BASE_DIR, "data", "policy")
+    policy_file = os.path.join(INTENT_DIR, policy_file)
+
     print("\n=== Generating and Installing OpenFlow rules from intents ===")
     time.sleep(1)
 
-    # ✅ Clear old flows first
     try:
         requests.delete("http://127.0.0.1:8080/stats/flowentry/clear/1")
         print("🧹 Cleared old flows.")
     except Exception as e:
         print("⚠️ Cannot clear flows:", e)
 
-    # 🔑 Generate rules + app mapping from intents
-    rules, app_to_ip = intents_to_rules(POLICY_FILE, MAPPING_FILE)
+    rules, app_to_ip = intents_to_rules(policy_file, MAPPING_FILE)
 
     print("\nGenerated Rules:")
     print(json.dumps(rules, indent=2))
@@ -69,10 +68,10 @@ if __name__ == "__main__":
     print("\nApplication → Mininet IP mapping:")
     print(json.dumps(app_to_ip, indent=2))
 
-    # 🚀 Install them into controller
     install_rules(rules)
 
     print("\n=== Now test in Mininet ===")
     print("  h1 ping -c 2 h2   # should FAIL (if deny rule applied)")
     print("  h1 ping -c 2 h3   # should SUCCEED (if allow rule applied)")
     print("  h1 ping -c 2 hX   # other hosts follow default rule")
+
