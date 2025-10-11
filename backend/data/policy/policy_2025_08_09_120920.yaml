@@ -11,7 +11,7 @@ intents:
 
   - application: zoom
     action: prioritize
-    condition:
+    condition:  
       time:
         start: "09:00"
         end: "17:00"

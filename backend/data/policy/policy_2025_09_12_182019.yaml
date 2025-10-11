@@ -1,0 +1,11 @@
+
+description: Block Facebook and allow Instagram during working hours (9 AM to 5 PM).
+intents:
+  - application: facebook
+    action: deny
+    condition:
+      time: "09:00-17:00"
+  - application: instagram
+    action: allow
+    condition:
+      time: "09:00-17:00"
