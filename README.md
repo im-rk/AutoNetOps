@@ -1,2 +1,2 @@
-## AutoNetOps: Intent-Based Network Automation Platform (SDN + NFV)
+## AutoNetOps: Intent-Based Network Automation Platform SDN-(ryu-controller) and mininet
 
